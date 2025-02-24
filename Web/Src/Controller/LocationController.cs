@@ -8,7 +8,7 @@ namespace Web.Src.Сontroller
 {
     [ApiController]
     [Route("api/location")]
-    public class LocationController(ILocationService locationService, IRedisCacheService cacheService) : Controller
+    public class LocationController(ILocationService locationService, IRedisCacheService cacheService) : Microsoft.AspNetCore.Mvc.Controller
     {
         /// <summary>
         /// Fetches the current user's location.
