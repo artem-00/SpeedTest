@@ -6,7 +6,7 @@ namespace Web.Src.Сontroller
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ServerController(IServerService serverService) : Controller
+    public class ServerController(IServerService serverService) : Microsoft.AspNetCore.Mvc.Controller
     {
         [HttpGet("list")]
         public async Task<IActionResult> GetServerList()

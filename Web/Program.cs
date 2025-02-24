@@ -11,8 +11,6 @@ namespace Web
         {
             var builder = WebApplication.CreateBuilder(args);
 
-
-
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
@@ -33,6 +31,7 @@ namespace Web
             builder.Services.AddHttpClient();
             builder.Services.AddScoped<IFileReader, FileReader>();
             builder.Services.AddScoped<IServerService, ServerService>();
+            builder.Services.AddScoped<ILocationService, LocationService>();
             builder.Services.AddControllers();
             
 
