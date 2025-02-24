@@ -10,7 +10,7 @@ namespace Web.Src.Service
 
         public async Task<List<Server>> GetServersAsync()
         {
-            if (!await fileReader.ExistsAsync(File)) 
+            if (!await fileReader.ExistsAsync(File))
             {
                 throw new FileNotFoundException("File server.json not found");
             }
@@ -28,16 +28,29 @@ namespace Web.Src.Service
             }
         }
 
-        public async Task AddServerAsync(Server server)
+        public async Task AddServerAsync(string host)
         {
             var servers = await GetServersAsync();
-            var existingServer = servers.FirstOrDefault(s => s.Host.Equals(server.Host, StringComparison.OrdinalIgnoreCase));
+            var existingServer = servers.FirstOrDefault(s => s.Host == host);
             if (existingServer != null)
             {
-                throw new Exception($"Сервер с хостом: {server.Host} уже существует");
+                throw new Exception($"Server with host: {host} already exists");
             }
 
-            servers.Add(server);
+            var locationService = new LocationService(new HttpClient());
+            var (latitude, longitude, city, country) =
+                await locationService.GetLocationByIpAsync(host);
+
+            var newServer = new Server
+            {
+                Host = host,
+                Latitude = latitude,
+                Longitude = longitude,
+                Country = country,
+                City = city
+            };
+
+            servers.Add(newServer);
 
             var jsonData = JsonConvert.SerializeObject(servers);
             await System.IO.File.WriteAllTextAsync(File, jsonData);
@@ -49,38 +62,45 @@ namespace Web.Src.Service
             await fileReader.WriteAllTextAsync(File, jsonData);
         }
 
-        public async Task DeleteServerAsync(string city, string? host = null)
+        public async Task DeleteServerAsync(string? city = null, string? host = null)
         {
             var servers = await GetServersAsync();
 
-            var cityServer = servers.Where(s =>
-                s.City.Equals(city, StringComparison.OrdinalIgnoreCase)).ToList();
-
-            if (cityServer.Count == 0)
+            if (string.IsNullOrEmpty(city) && string.IsNullOrEmpty(host))
             {
-                throw new InvalidOperationException($"No server for city: {city}");
+                throw new ArgumentException("At least one parameter (city or host) must be provided.");
             }
 
-            Server? serverToRemove;
+            List<Server> matchingServers;
 
-            if (cityServer.Count > 1)
+            if (!string.IsNullOrEmpty(city))
             {
-                if (string.IsNullOrEmpty(host))
-                {
-                    throw new ArgumentException($"Multiple servers found for city: {city}. Please specify the host.");
-                }
+                matchingServers = servers.Where(s => s.City.Equals(city, StringComparison.OrdinalIgnoreCase)).ToList();
 
-                serverToRemove = cityServer.FirstOrDefault(s =>
-                    s.Host.Equals(host, StringComparison.OrdinalIgnoreCase));
-
-                if (serverToRemove == null)
+                switch (matchingServers.Count)
                 {
-                    throw new InvalidOperationException($"Server with host: {host} not found in city: {city}");
+                    case 0:
+                        throw new InvalidOperationException($"No servers found for city: {city}");
+                    case > 1 when string.IsNullOrEmpty(host):
+                        throw new ArgumentException($"Multiple servers found in city: {city}. Please specify a host.");
                 }
             }
             else
             {
-                serverToRemove = cityServer.First();
+                matchingServers = servers.Where(s => s.Host.Equals(host, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                if (matchingServers.Count == 0)
+                {
+                    throw new InvalidOperationException($"No server found with host: {host}");
+                }
+            }
+
+            var serverToRemove = matchingServers.FirstOrDefault(s =>
+                string.IsNullOrEmpty(host) || s.Host.Equals(host, StringComparison.OrdinalIgnoreCase));
+
+            if (serverToRemove == null)
+            {
+                throw new InvalidOperationException($"Server with host: {host} not found in city: {city}");
             }
 
             servers.Remove(serverToRemove);
@@ -89,10 +109,11 @@ namespace Web.Src.Service
             await fileReader.WriteAllTextAsync(File, jsonData);
         }
 
-        public async Task DeleteAllServerAsync (string country)
+
+        public async Task DeleteAllServerAsync(string country)
         {
             var servers = await GetServersAsync();
-            var updatedServer = servers.Where(s => 
+            var updatedServer = servers.Where(s =>
                 !s.Country.Equals(country, StringComparison.OrdinalIgnoreCase)).ToList();
 
             if (updatedServer.Count == servers.Count)
