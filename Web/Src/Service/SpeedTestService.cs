@@ -1,14 +1,18 @@
 ﻿using System.Diagnostics;
-using System.Drawing;
+using Web.Src.Model;
 
 namespace Web.Src.Service
 {
     public class SpeedTestService(
         IConfiguration configuration,
-        Func<HttpClient> httpClientFactory) : ISpeedTestService
+        ILocationService locationService,
+        Func<HttpClient> httpClientFactory)
+        : ISpeedTestService
     {
+        private static readonly int[] DownloadSizes = [350, 750, 1500, 3000];
         private const int Buffer = 8192;
         private const double Size = 1024;
+        private readonly TimeSpan _downloadTimeout = TimeSpan.FromSeconds(5);
 
         public async Task<double> FastDownloadSpeedAsync(TimeSpan duration)
         {
@@ -45,6 +49,79 @@ namespace Web.Src.Service
             }
 
             var speedInMbps = ((totalDownloaded / Size / Size) / stopwatch.Elapsed.TotalSeconds) * 8;
+            return Math.Round(speedInMbps, 3);
+        }
+
+        public async Task<DownloadSpeed> GetDownloadSpeed(string? host = null)
+        {
+            try
+            {
+                var server = host != null
+                    ? (await locationService.LoadServersAsync())
+                      .FirstOrDefault(s => s.Host.Equals(host, StringComparison.OrdinalIgnoreCase))
+                      ?? throw new Exception($"Server '{host}' not found")
+                    : await locationService.GetBestServerAsync();
+
+                var pingService = new PingService();
+                var ping = await pingService.CheckPingAsync(server!.Host, 5000);
+
+                var downloadUrls = GenerateDownloadUrls(server, 3);
+                var speed = await DownloadAndMeasureSpeedAsync(downloadUrls, _downloadTimeout);
+
+                return new DownloadSpeed
+                {
+                    Server = server,
+                    Speed = Math.Round(speed, 3),
+                    Unit = "Mbps",
+                    Ping = ping,
+                    Source = "SpeedTestService"
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Failed to get download speed", ex);
+            }
+        }
+
+        private static IEnumerable<string> GenerateDownloadUrls(Server server, int retryCount = 1)
+        {
+            var downloadUriBase = new Uri(
+                new Uri($"http://{server.Host}:8080/"), ".").OriginalString + 
+                                  "random{0}x{0}.jpg?r={1}";
+
+            foreach (var downloadSize in DownloadSizes)
+            {
+                for (var i = 0; i < retryCount; i++)
+                {
+                    yield return string.Format(downloadUriBase, downloadSize, i + 1);
+                }
+            }
+        }
+
+        private async Task<double> DownloadAndMeasureSpeedAsync(IEnumerable<string> urls, TimeSpan timeout)
+        {
+            double totalDownloaded = 0;
+            var stopwatch = Stopwatch.StartNew();
+
+            using var cts = new CancellationTokenSource(timeout);
+
+            while (stopwatch.Elapsed < timeout)
+            {
+                foreach (var url in urls)
+                {
+                    try
+                    {
+                        totalDownloaded += await DownloadFileAsync(url, cts.Token);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Ошибка загрузки {url}: {ex.Message}");
+                    }
+                }
+            }
+
+            stopwatch.Stop();
+            var speedInMbps = ((totalDownloaded / Size / Size) / timeout.TotalSeconds) * 8;
             return Math.Round(speedInMbps, 3);
         }
 
