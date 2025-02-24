@@ -6,7 +6,7 @@ namespace Web.Src.Сontroller
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class PingController(IPingService pingService) : Microsoft.AspNetCore.Mvc.Controller
+    public class PingController(IPingService pingService) : Controller
     {
         /// <summary>
         /// Performs a ping operation to check the reachability of a specified host.
