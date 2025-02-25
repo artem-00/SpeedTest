@@ -5,7 +5,7 @@
 2. [🛠 Used technologies](#technologies)
 3. [🔗 API Endpoints](#endpoints)
 4. [🚀 Installation and launch](#installation)
-5. [👤 Author](#author)
+5. [👤 Authors](#authors)
 
 ## <a id = "about"> 1. 📖 About the project </a>
 
@@ -317,8 +317,8 @@ KEYS server-city:* #Getting all cached cities
 GET server-city:your_city #Getting the contents of your_city
 ```
 
-## <a id = "author"> 5. 👤 Author </a>
-Author: 
+## <a id = "authors"> 5. 👤 Authors </a>
+Authors: 
 - [undertakerprog](https://github.com/undertakerprog)
 - [GwinBest](https://github.com/GwinBest)
 - [elegardooo](https://github.com/elegardooo) 
