@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Desktop.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="SpeedUnit" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Mbps</Value>
+    </Setting>
+    <Setting Name="SpeedTestUri" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost:5252/api/SpeedTest/</Value>
+    </Setting>
+    <Setting Name="LocationUri" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://localhost:5252/api/Location/</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

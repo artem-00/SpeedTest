@@ -1,0 +1,57 @@
+﻿<Page x:Class="Desktop.Views.SettingsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="SettingsPage">
+    <Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <CheckBox x:Name="ShowSpeedCheckBoxControl"
+                      Content="Show network speed in a separate window"
+                      FontSize="18"  
+                FontWeight="Bold"
+                Foreground="#4A90E2"
+                      Checked="ShowSpeedInTrayCheckBox_Checked"
+                      Unchecked="ShowSpeedInTrayCheckBox_Unchecked"/>
+                <ContentControl x:Name="AppBarContainer"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Foreground="#184c91"
+                            Visibility="Collapsed" />
+                <TextBlock Text="Choose speed unit: " 
+                       FontSize="18"  
+                       FontWeight="Bold"  
+                       Margin="0,20,0,10" 
+                       Foreground="#4A90E2" 
+                       HorizontalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <RadioButton x:Name="MbpsRadioButton" 
+                             Content="Mbps" 
+                             FontSize="16"  
+                             FontWeight="Bold" 
+                             GroupName="SpeedUnits" 
+                             Checked="SpeedUnitRadioButton_Checked" 
+                             Foreground="#4A90E2"/>
+                <RadioButton x:Name="KbpsRadioButton" 
+                             Content="Kbps" 
+                             FontSize="16" 
+                             FontWeight="Bold" 
+                             GroupName="SpeedUnits" 
+                             Checked="SpeedUnitRadioButton_Checked" 
+                             Foreground="#4A90E2"/>
+                <RadioButton x:Name="MBpsRadioButton" 
+                             Content="MBps" 
+                             FontSize="16"  
+                             FontWeight="Bold"  
+                             GroupName="SpeedUnits" 
+                             Checked="SpeedUnitRadioButton_Checked" 
+                             Foreground="#4A90E2"/>
+                <RadioButton x:Name="KBpsRadioButton" 
+                             Content="KBps" 
+                             FontSize="16" 
+                             FontWeight="Bold"  
+                             GroupName="SpeedUnits" 
+                             Checked="SpeedUnitRadioButton_Checked" 
+                             Foreground="#4A90E2"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Page>
