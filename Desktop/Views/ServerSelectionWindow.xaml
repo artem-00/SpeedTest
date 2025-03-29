@@ -1,0 +1,20 @@
+﻿<Window x:Class="Desktop.Views.ServerSelectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Select Server" Height="300" Width="250"
+        ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <DockPanel Margin="10">
+        <TextBox x:Name="ServerFilterTextBox"
+                 Height="30"
+                 DockPanel.Dock="Top"
+                 VerticalAlignment="Top"
+                 Text="Search city for test"
+                 Foreground="Gray"
+                 GotFocus="ServerFilterTextBox_GotFocus"
+                 LostFocus="ServerFilterTextBox_LostFocus"
+                 PreviewKeyDown="ServerFilterTextBox_PreviewKeyDown"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="ServerLinksPanel" Orientation="Vertical"/>
+        </ScrollViewer>
+    </DockPanel>
+</Window>
